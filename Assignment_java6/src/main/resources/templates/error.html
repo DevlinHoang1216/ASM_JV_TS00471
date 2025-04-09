@@ -1,0 +1,21 @@
+<!DOCTYPE html>
+<html lang="vi" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lỗi</title>
+    <link href="/css/bootstrap.min.css" rel="stylesheet">
+</head>
+<body>
+<div class="container mt-5">
+    <h1 class="text-center mb-4">Có lỗi xảy ra</h1>
+    <div class="alert alert-danger" role="alert">
+        <p th:text="${errorMessage != null ? errorMessage : 'Đã có lỗi xảy ra. Vui lòng thử lại sau.'}"></p>
+    </div>
+    <div class="text-center">
+        <a href="/admin/orders/view" class="btn btn-primary">Quay lại</a>
+    </div>
+</div>
+<script src="/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

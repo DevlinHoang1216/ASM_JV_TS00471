@@ -6,9 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
-import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.util.Date;
 import java.util.List;
 
 @Getter
@@ -44,4 +42,7 @@ public class Orders {
     @ManyToOne
     @JoinColumn(name = "customer_id", insertable = false, updatable = false)
     private Customer customer;
+
+    @OneToMany(mappedBy = "order", fetch = FetchType.LAZY)
+    private List<OrderDetails> orderDetails; // Thêm quan hệ @OneToMany
 }

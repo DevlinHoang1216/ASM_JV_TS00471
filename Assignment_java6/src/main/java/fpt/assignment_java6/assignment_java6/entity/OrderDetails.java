@@ -18,12 +18,6 @@ public class OrderDetails {
     @Column(name = "order_detail_id")
     private Long orderDetailId;
 
-    @Column(name = "order_id")
-    private Long orderId;
-
-    @Column(name = "product_id")
-    private Long productId;
-
     @Column(name = "quantity", nullable = false)
     private Integer quantity;
 
@@ -31,10 +25,10 @@ public class OrderDetails {
     private double price;
 
     @ManyToOne
-    @JoinColumn(name = "order_id", insertable = false, updatable = false)
+    @JoinColumn(name = "order_id", nullable = false)
     private Orders order;
 
     @ManyToOne
-    @JoinColumn(name = "product_id", insertable = false, updatable = false)
+    @JoinColumn(name = "product_id", nullable = false)
     private Products product;
 }

@@ -1,32 +1,74 @@
-﻿GO
+﻿
+GO
 USE MASTER
 GO
 CREATE DATABASE ASSIGNMENT_BANTRAICAY
 GO
 USE ASSIGNMENT_BANTRAICAY
 
+-- Bảng users (Người dùng)
+CREATE TABLE users (
+    user_id INT IDENTITY(1,1) PRIMARY KEY,
+    email NVARCHAR(100) UNIQUE NOT NULL,
+    password_hash NVARCHAR(255) NOT NULL,
+    role NVARCHAR(20) CHECK (role IN (N'user', N'admin')) DEFAULT N'user',
+    created_at DATETIME DEFAULT GETDATE()
+);
+
 -- Bảng customers (Khách hàng)
 CREATE TABLE customers (
     customer_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT UNIQUE, -- Liên kết với bảng users
     full_name NVARCHAR(100) NOT NULL,
-    email NVARCHAR(100) UNIQUE NOT NULL,
     phone NVARCHAR(15),
     address NVARCHAR(MAX),
-    created_at DATETIME DEFAULT GETDATE(),
-    password_hash NVARCHAR(255) NOT NULL
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
 );
 
-INSERT INTO customers (full_name, email, phone, address, created_at, password_hash) VALUES
-(N'Nguyễn Văn A', 'nguyenvana@gmail.com', '0901234567', N'123 Đường Láng, Hà Nội', '2025-01-01 10:00:00', 'hashed_password_1'),
-(N'Trần Thị B', 'tranthib@gmail.com', '0912345678', N'45 Lê Lợi, TP.HCM', '2025-01-02 15:30:00', 'hashed_password_2'),
-(N'Lê Minh C', 'leminhc@gmail.com', '0923456789', N'78 Hùng Vương, Đà Nẵng', '2025-01-03 09:15:00', 'hashed_password_3'),
-(N'Phạm Thị D', 'phamthid@gmail.com', '0934567890', N'12 Nguyễn Trãi, Huế', '2025-01-04 14:20:00', 'hashed_password_4'),
-(N'Hoàng Văn E', 'hoangvane@gmail.com', '0945678901', N'56 Trần Phú, Nha Trang', '2025-01-05 11:45:00', 'hashed_password_5'),
-(N'Đỗ Thị F', 'dothif@gmail.com', '0956789012', N'89 Phạm Ngũ Lão, Hà Nội', '2025-01-06 16:10:00', 'hashed_password_6'),
-(N'Vũ Văn G', 'vuvang@gmail.com', '0967890123', N'34 Nguyễn Huệ, TP.HCM', '2025-01-07 13:25:00', 'hashed_password_7'),
-(N'Bùi Thị H', 'buithih@gmail.com', '0978901234', N'67 Lê Đại Hành, Đà Lạt', '2025-01-08 08:50:00', 'hashed_password_8'),
-(N'Ngô Văn I', 'ngovani@gmail.com', '0989012345', N'90 Bạch Đằng, Hải Phòng', '2025-01-09 17:00:00', 'hashed_password_9'),
-(N'Mai Thị K', 'maithik@gmail.com', '0990123456', N'23 Điện Biên Phủ, Cần Thơ', '2025-01-10 12:30:00', 'hashed_password_10');
+-- Bảng admins (Quản trị viên)
+CREATE TABLE admins (
+    admin_id INT IDENTITY(1,1) PRIMARY KEY,
+    user_id INT UNIQUE, -- Liên kết với bảng users
+    username NVARCHAR(50) UNIQUE NOT NULL,
+    full_name NVARCHAR(100),
+    email NVARCHAR(100),
+    FOREIGN KEY (user_id) REFERENCES users(user_id)
+);
+
+-- Chèn dữ liệu vào bảng users
+INSERT INTO users (email, password_hash, role, created_at) VALUES
+('nguyenvana@gmail.com', 'hashed_password_1', N'admin', '2025-01-01 10:00:00'),
+('tranthib@gmail.com', 'hashed_password_2', N'user', '2025-01-02 15:30:00'),
+('leminhc@gmail.com', 'hashed_password_3', N'user', '2025-01-03 09:15:00'),
+('phamthid@gmail.com', 'hashed_password_4', N'user', '2025-01-04 14:20:00'),
+('hoangvane@gmail.com', 'hashed_password_5', N'user', '2025-01-05 11:45:00'),
+('dothif@gmail.com', 'hashed_password_6', N'user', '2025-01-06 16:10:00'),
+('vuvang@gmail.com', 'hashed_password_7', N'user', '2025-01-07 13:25:00'),
+('buithih@gmail.com', 'hashed_password_8', N'user', '2025-01-08 08:50:00'),
+('ngovani@gmail.com', 'hashed_password_9', N'user', '2025-01-09 17:00:00'),
+('maithik@gmail.com', 'hashed_password_10', N'user', '2025-01-10 12:30:00'),
+('admin1@gmail.com', 'hashed_password_admin1', N'admin', '2025-01-01 08:00:00'),
+('admin2@gmail.com', 'hashed_password_admin2', N'admin', '2025-01-01 08:00:00'),
+('admin3@gmail.com', 'hashed_password_admin3', N'admin', '2025-01-01 08:00:00');
+
+-- Chèn dữ liệu vào bảng customers
+INSERT INTO customers (user_id, full_name, phone, address) VALUES
+(1, N'Nguyễn Văn A', '0901234567', N'123 Đường Láng, Hà Nội'),
+(2, N'Trần Thị B', '0912345678', N'45 Lê Lợi, TP.HCM'),
+(3, N'Lê Minh C', '0923456789', N'78 Hùng Vương, Đà Nẵng'),
+(4, N'Phạm Thị D', '0934567890', N'12 Nguyễn Trãi, Huế'),
+(5, N'Hoàng Văn E', '0945678901', N'56 Trần Phú, Nha Trang'),
+(6, N'Đỗ Thị F', '0956789012', N'89 Phạm Ngũ Lão, Hà Nội'),
+(7, N'Vũ Văn G', '0967890123', N'34 Nguyễn Huệ, TP.HCM'),
+(8, N'Bùi Thị H', '0978901234', N'67 Lê Đại Hành, Đà Lạt'),
+(9, N'Ngô Văn I', '0989012345', N'90 Bạch Đằng, Hải Phòng'),
+(10, N'Mai Thị K', '0990123456', N'23 Điện Biên Phủ, Cần Thơ');
+
+-- Chèn dữ liệu vào bảng admins
+INSERT INTO admins (user_id, username, full_name, email) VALUES
+(11, 'admin1', N'Nguyễn Admin', 'admin1@gmail.com'),
+(12, 'admin2', N'Trần Quản Lý', 'admin2@gmail.com'),
+(13, 'admin3', N'Lê Quản Trị', 'admin3@gmail.com');
 
 -- Bảng categories (Danh mục)
 CREATE TABLE categories (
@@ -161,20 +203,6 @@ INSERT INTO reviews (customer_id, product_id, rating, comment, review_date) VALU
 (8, 8, 5, N'Dâu tây siêu ngọt', '2025-03-09 16:00:00'),
 (9, 9, 4, N'Thanh long tươi, ok', '2025-03-10 13:25:00'),
 (10, 10, 5, N'Mít thơm, tuyệt vời', '2025-03-11 08:50:00');
-
--- Bảng admins (Quản trị viên)
-CREATE TABLE admins (
-    admin_id INT IDENTITY(1,1) PRIMARY KEY,
-    username NVARCHAR(50) UNIQUE NOT NULL,
-    password_hash NVARCHAR(255) NOT NULL,
-    full_name NVARCHAR(100),
-    email NVARCHAR(100)
-);
-
-INSERT INTO admins (username, password_hash, full_name, email) VALUES
-('admin1', 'hashed_password_admin1', N'Nguyễn Admin', 'admin1@gmail.com'),
-('admin2', 'hashed_password_admin2', N'Trần Quản Lý', 'admin2@gmail.com'),
-('admin3', 'hashed_password_admin3', N'Lê Quản Trị', 'admin3@gmail.com');
 
 -- Bảng promotions (Khuyến mãi)
 CREATE TABLE promotions (

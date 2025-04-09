@@ -2,37 +2,172 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Quản lý đơn hàng</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body {
+      background-color: #f5f5f5;
+      font-family: Arial, sans-serif;
+    }
+    .container {
+      margin-top: 20px;
+    }
+    .card {
+      border: none;
+      border-radius: 10px;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+    }
+    .card-header {
+      background-color: #28a745; /* Màu xanh lá */
+      color: white;
+      font-weight: bold;
+      border-radius: 10px 10px 0 0;
+    }
+    .table {
+      margin-bottom: 0;
+    }
+    .table th {
+      background-color: #f8f9fa;
+      border-top: none;
+    }
+    .table td {
+      vertical-align: middle;
+    }
+    .btn-action {
+      margin-right: 5px;
+    }
+    .btn-action.btn-primary {
+      background-color: #2ecc71; /* Xanh lá nhạt, hợp với tiêu đề */
+      border: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Bóng đậm */
+      transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+    }
+    .btn-action.btn-primary:hover {
+      background-color: #27ae60; /* Đậm hơn khi hover */
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4); /* Bóng đậm hơn khi hover */
+      transform: scale(1.05); /* Phóng to nhẹ khi hover */
+    }
+    .btn-action.btn-danger {
+      background-color: #e74c3c; /* Đỏ nhẹ nhàng, hợp với tiêu đề */
+      border: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Bóng đậm */
+      transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+    }
+    .btn-action.btn-danger:hover {
+      background-color: #c0392b; /* Đậm hơn khi hover */
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4); /* Bóng đậm hơn khi hover */
+      transform: scale(1.05); /* Phóng to nhẹ khi hover */
+    }
+    .pagination {
+      justify-content: center;
+      margin-top: 20px;
+    }
+    /* Thêm style từ order-detail.html để đồng nhất */
+    .form-label {
+      font-weight: bold;
+    }
+    .form-control {
+      background-color: #f8f9fa;
+      border: 1px solid #ced4da;
+    }
+    .btn-save {
+      background-color: #28a745; /* Đồng màu với tiêu đề */
+      border: none;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Bóng đậm */
+      transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+    }
+    .btn-save:hover {
+      background-color: #218838; /* Đậm hơn khi hover */
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4); /* Bóng đậm hơn khi hover */
+      transform: scale(1.05); /* Phóng to nhẹ khi hover */
+    }
+    /* Thêm style cho nút Quay lại để đồng nhất */
+    .btn-back {
+      background-color: #f1c40f; /* Màu vàng */
+      border: none;
+      margin-right: 10px;
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Bóng đậm */
+      transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+    }
+    .btn-back:hover {
+      background-color: #d4ac0d; /* Đậm hơn khi hover */
+      box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4); /* Bóng đậm hơn khi hover */
+      transform: scale(1.05); /* Phóng to nhẹ khi hover */
+    }
+  </style>
 </head>
 <body>
-<div class="container mt-5">
-  <h1 class="text-center mb-4">Quản lý đơn hàng</h1>
-  <table class="table table-bordered table-hover">
-    <thead class="table-light">
-    <tr>
-      <th>Mã đơn hàng</th>
-      <th>Ngày thanh toán</th>
-      <th>Đang giao</th>
-      <th>Hoàn thành</th>
-      <th>Đã hủy</th>
-      <th>Thao tác</th>
-    </tr>
-    </thead>
-    <tbody>
-    <tr th:each="order : ${ordersList}">
-      <td th:text="${order.orderId}"></td>
-      <td th:text="${order.orderDate != null ? order.orderDate : 'Chưa có'}">Ngày thanh toán</td>
-      <td th:text="${order.status == 'SHIPPING' ? 'Đang giao' : ''}"></td>
-      <td th:text="${order.status == 'COMPLETED' ? 'Hoàn thành' : ''}"></td>
-      <td th:text="${order.status == 'CANCELLED' ? 'Đã hủy' : ''}"></td>
-      <td>
-        <a th:href="@{'/admin/orders/detail/' + ${order.orderId}}" class="btn btn-primary btn-sm">Xem chi tiết</a>
-      </td>
-    </tr>
-    </tbody>
-  </table>
+<div class="container">
+  <div class="card">
+    <div class="card-header">
+      DANH SÁCH
+    </div>
+    <div class="card-body">
+      <table class="table table-bordered">
+        <thead>
+        <tr>
+          <th>MÃ ĐƠN HÀNG</th>
+          <th>ĐỊA CHỈ</th>
+          <th>TÊN NGƯỜI NHẬN</th>
+          <th>SỐ ĐIỆN THOẠI</th>
+          <th>TỔNG TIỀN</th>
+          <th>NGÀY ĐẶT HÀNG</th>
+          <th>TRẠNG THÁI</th>
+          <th>THAO TÁC</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:each="order : ${ordersList}">
+          <td th:text="${order.orderId}"></td>
+          <td th:text="${order.shippingAddress != null ? order.shippingAddress : 'Chưa có'}"></td>
+          <td th:text="${order.customer != null && order.customer.fullName != null ? order.customer.fullName : 'Chưa có'}"></td>
+          <td th:text="${order.customer != null && order.customer.phone != null ? order.customer.phone : 'Chưa có'}"></td>
+          <td th:text="${#numbers.formatDecimal(order.totalAmount, 0, 'COMMA', 0, 'POINT')}"></td>
+          <td th:text="${order.orderDate != null ? #temporals.format(order.orderDate, 'dd/MM/yyyy') : 'Chưa có'}"></td>
+          <td>
+            <span th:if="${order.status == null}">Không xác định</span>
+            <span th:if="${#strings.equalsIgnoreCase(order.status, 'Đang giao')}">Đang giao</span>
+            <span th:if="${#strings.equalsIgnoreCase(order.status, 'Hoàn thành')}">Hoàn thành</span>
+            <span th:if="${#strings.equalsIgnoreCase(order.status, 'Hủy') or #strings.equalsIgnoreCase(order.status, 'Huỷ')}">Hủy</span>
+            <span th:if="${#strings.equalsIgnoreCase(order.status, 'Chờ xử lý')}">Chờ xử lý</span>
+            <span th:if="${order.status != null
+              and !#strings.equalsIgnoreCase(order.status, 'Đang giao')
+              and !#strings.equalsIgnoreCase(order.status, 'Hoàn thành')
+              and !#strings.equalsIgnoreCase(order.status, 'Hủy')
+              and !#strings.equalsIgnoreCase(order.status, 'Huỷ')
+              and !#strings.equalsIgnoreCase(order.status, 'Chờ xử lý')}">Không xác định</span>
+          </td>
+          <td>
+            <a th:href="@{'/admin/orders/detail/' + ${order.orderId}}" class="btn btn-primary btn-sm btn-action">Chi tiết</a>
+            <a th:href="@{'/admin/orders/delete/' + ${order.orderId}}" class="btn btn-danger btn-sm btn-action">Xóa</a>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- Phân trang -->
+  <nav th:if="${totalPages > 1}">
+    <ul class="pagination">
+      <li class="page-item" th:classappend="${currentPage == 0} ? 'disabled'">
+        <a class="page-link" th:href="@{'/admin/orders/view?page=' + ${currentPage - 1}}">Trước</a>
+      </li>
+      <li class="page-item" th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+          th:classappend="${i == currentPage} ? 'active'">
+        <a class="page-link" th:href="@{'/admin/orders/view?page=' + ${i}}" th:text="${i + 1}"></a>
+      </li>
+      <li class="page-item" th:classappend="${currentPage == totalPages - 1} ? 'disabled'">
+        <a class="page-link" th:href="@{'/admin/orders/view?page=' + ${currentPage + 1}}">Sau</a>
+      </li>
+    </ul>
+  </nav>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92ceca611da2bfc0',t:'MTc0NDA4NDEyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92d09b9dde4d674d',t:'MTc0NDEwMzE3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92d0af60fc99c00b',t:'MTc0NDEwMzk4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

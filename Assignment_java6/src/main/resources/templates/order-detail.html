@@ -2,44 +2,155 @@
 <html lang="vi" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>Chi tiết đơn hàng</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Thông tin đơn hàng</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f5f5f5;
+            font-family: Arial, sans-serif;
+        }
+        .container {
+            margin-top: 20px;
+        }
+        .card {
+            border: none;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+        .card-header {
+            background-color: #28a745; /* Màu xanh lá */
+            color: white;
+            font-weight: bold;
+            border-radius: 10px 10px 0 0;
+        }
+        .form-label {
+            font-weight: bold;
+        }
+        .form-control {
+            background-color: #f8f9fa;
+            border: 1px solid #ced4da;
+        }
+        .btn-save {
+            background-color: #28a745; /* Đồng màu với tiêu đề */
+            border: none;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Bóng đậm */
+            transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+        }
+        .btn-save:hover {
+            background-color: #218838; /* Đậm hơn khi hover */
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4); /* Bóng đậm hơn khi hover */
+            transform: scale(1.05); /* Phóng to nhẹ khi hover */
+        }
+        .btn-back {
+            background-color: #f1c40f; /* Màu vàng */
+            border: none;
+            margin-right: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3); /* Bóng đậm */
+            transition: all 0.3s ease; /* Hiệu ứng mượt mà */
+        }
+        .btn-back:hover {
+            background-color: #d4ac0d; /* Đậm hơn khi hover */
+            box-shadow: 0 6px 14px rgba(0, 0, 0, 0.4); /* Bóng đậm hơn khi hover */
+            transform: scale(1.05); /* Phóng to nhẹ khi hover */
+        }
+        .table {
+            margin-bottom: 0;
+        }
+        .table th {
+            background-color: #f8f9fa;
+            border-top: none;
+        }
+        .table td {
+            vertical-align: middle;
+        }
+    </style>
 </head>
 <body>
-<div class="container mt-5">
-    <h1 class="text-center mb-4">Chi tiết đơn hàng</h1>
+<div class="container">
     <div class="card">
+        <div class="card-header">
+            CHI TIẾT ĐƠN HÀNG
+        </div>
         <div class="card-body">
-            <h5 class="card-title">Mã đơn hàng: <span th:text="${order.orderId}"></span></h5>
-            <p class="card-text">Ngày đặt hàng: <span th:text="${order.orderDate != null ? order.orderDate : 'Chưa có'}"></span></p>
-            <p class="card-text">Trạng thái: <span th:text="${order.status != null ? order.status : 'Chưa có'}"></span></p>
-            <p class="card-text">Tổng tiền: <span th:text="${order.totalAmount}"></span> VNĐ</p>
-            <p class="card-text">Địa chỉ giao hàng: <span th:text="${order.shippingAddress != null ? order.shippingAddress : 'Chưa có'}"></span></p>
-            <p class="card-text">Phương thức thanh toán: <span th:text="${order.paymentMethod != null ? order.paymentMethod : 'Chưa có'}"></span></p>
+            <h5 class="card-title">Thông tin đơn hàng</h5>
+            <form th:action="@{'/admin/orders/update/' + ${order.orderId}}" method="post">
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Tên người nhận</label>
+                        <input type="text" class="form-control" name="fullName" th:value="${order.customer != null && order.customer.fullName != null ? order.customer.fullName : 'Chưa có'}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Địa chỉ</label>
+                        <input type="text" class="form-control" name="shippingAddress" th:value="${order.shippingAddress != null ? order.shippingAddress : 'Chưa có'}">
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Số điện thoại</label>
+                        <input type="text" class="form-control" name="phone" th:value="${order.customer != null && order.customer.phone != null ? order.customer.phone : 'Chưa có'}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Trạng thái</label>
+                        <select class="form-select" name="status">
+                            <option value="Đang giao" th:selected="${order.status != null && #strings.equalsIgnoreCase(order.status, 'Đang giao')}">Đang giao</option>
+                            <option value="Hoàn thành" th:selected="${order.status != null && #strings.equalsIgnoreCase(order.status, 'Hoàn thành')}">Hoàn thành</option>
+                            <option value="Hủy" th:selected="${order.status != null && (#strings.equalsIgnoreCase(order.status, 'Hủy') or #strings.equalsIgnoreCase(order.status, 'Huỷ'))}">Hủy</option>
+                            <option value="Đã hủy" th:selected="${order.status != null && #strings.equalsIgnoreCase(order.status, 'Đã hủy')}">Đã hủy</option>
+                            <option value="Chờ xử lý" th:selected="${order.status != null && #strings.equalsIgnoreCase(order.status, 'Chờ xử lý')}">Chờ xử lý</option>
+                        </select>
+                    </div>
+                </div>
+                <div class="row mb-3">
+                    <div class="col-md-6">
+                        <label class="form-label">Ngày đặt hàng</label>
+                        <input type="date" class="form-control" name="orderDate" th:value="${order.orderDate != null ? #temporals.format(order.orderDate, 'yyyy-MM-dd') : ''}">
+                    </div>
+                    <div class="col-md-6">
+                        <label class="form-label">Tổng tiền</label>
+                        <input type="number" class="form-control" name="totalAmount" th:value="${order.totalAmount != null ? order.totalAmount : 0}">
+                    </div>
+                </div>
+                <div class="text-end">
+                    <a th:href="@{'/admin/orders/view'}" class="btn btn-back">Quay lại</a>
+                    <button type="submit" class="btn btn-save">Lưu</button>
+                </div>
+            </form>
 
-            <h6 class="mt-4">Danh sách sản phẩm:</h6>
+            <h6 class="mt-4">Sản phẩm</h6>
             <table class="table table-bordered">
                 <thead>
                 <tr>
-                    <th>Tên sản phẩm</th>
-                    <th>Khối lượng (kg)</th>
-                    <th>Giá</th>
-                    <th>Tổng</th>
+                    <th>Sản phẩm</th>
+                    <th>Đơn giá</th>
+                    <th>Số lượng</th>
+                    <th>Thành tiền</th>
                 </tr>
                 </thead>
                 <tbody>
                 <tr th:each="orderDetail : ${orderDetailsList}">
-                    <td th:text="${orderDetail.product != null ? orderDetail.product.name : 'Chưa có'}"></td>
+                    <td th:text="${orderDetail.product != null && orderDetail.product.name != null ? orderDetail.product.name : 'Chưa có'}"></td>
+                    <td th:text="${#numbers.formatDecimal(orderDetail.price, 0, 'COMMA', 0, 'POINT')}"></td>
                     <td th:text="${orderDetail.quantity}"></td>
-                    <td th:text="${orderDetail.price}"></td>
-                    <td th:text="${orderDetail.quantity * orderDetail.price}"></td>
+                    <td th:text="${#numbers.formatDecimal(orderDetail.quantity * orderDetail.price, 0, 'COMMA', 0, 'POINT')}"></td>
                 </tr>
                 </tbody>
             </table>
         </div>
     </div>
-    <a href="/admin/orders" class="btn btn-secondary mt-3">Quay lại</a>
 </div>
+
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    // Tự động làm mới trang sau khi lưu form
+    document.querySelector('form').addEventListener('submit', function() {
+        setTimeout(function() {
+            window.location.reload();
+        }, 500); // Reload sau 500ms để đảm bảo dữ liệu được lưu
+    });
+</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92ceca611da2bfc0',t:'MTc0NDA4NDEyMS4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92d09b9dcd2753db',t:'MTc0NDEwMzE3Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
+<script>(function(){function c(){var b=a.contentDocument||a.contentWindow.document;if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'92d0af60f8efbcdf',t:'MTc0NDEwMzk4Ny4wMDAwMDA='};var a=document.createElement('script');a.nonce='';a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script>
 </body>
 </html>

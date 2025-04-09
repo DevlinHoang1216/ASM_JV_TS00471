@@ -10,6 +10,7 @@ import java.util.Optional;
 
 @Service
 public class OrderDetailsService {
+
     @Autowired
     private OrderDetailsRepository orderDetailsRepository;
 
@@ -29,7 +30,6 @@ public class OrderDetailsService {
         orderDetailsRepository.deleteById(id);
     }
 
-    // Thêm phương thức mới để lấy OrderDetails theo orderId
     public List<OrderDetails> getOrderDetailsByOrderId(Long orderId) {
         return orderDetailsRepository.findByOrderId(orderId);
     }
